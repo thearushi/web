@@ -1,0 +1,679 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VigilSec | Web Vulnerability Scanner</title>
+    <meta name="description" content="Automated baseline security configuration, TLS inspection, and security header auditing with active cyber security HUD and matrix animations.">
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Orbitron:wght@600;700;800;900&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <!-- Custom Cyber HUD Stylesheet -->
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <!-- Full-screen Cyber Canvas Animation Layer (3D Wireframe Globe, Matrix Rain, Cyber Grid, Particles) -->
+    <canvas id="cyber-bg-canvas"></canvas>
+
+    <!-- Scanline & Vignette Overlay -->
+    <div class="scanlines-overlay"></div>
+
+    <!-- Main Application Container -->
+    <div class="app-container">
+
+        <!-- =========================================================
+             LEFT SIDEBAR (Controls, Presets & Navigation)
+             ========================================================= -->
+        <aside class="sidebar">
+
+            <div class="sidebar-panel">
+                <!-- Branding Header -->
+                <div class="brand-header">
+                    <div class="brand-icon-wrapper">
+                        <!-- Dual-tone Neon Cyber Shield SVG -->
+                        <svg width="40" height="40" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <defs>
+                                <linearGradient id="shieldGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                                    <stop offset="0%" stop-color="#00f3ff"/>
+                                    <stop offset="60%" stop-color="#05d9e8"/>
+                                    <stop offset="100%" stop-color="#ff003c"/>
+                                </linearGradient>
+                                <linearGradient id="shieldInner" x1="0%" y1="0%" x2="100%" y2="100%">
+                                    <stop offset="0%" stop-color="rgba(0, 243, 255, 0.2)"/>
+                                    <stop offset="100%" stop-color="rgba(255, 0, 60, 0.4)"/>
+                                </linearGradient>
+                            </defs>
+                            <path d="M50 8 L85 24 V52 C85 75 50 92 50 92 C50 92 15 75 15 52 V24 L50 8 Z" 
+                                  stroke="url(#shieldGrad)" stroke-width="4.5" fill="url(#shieldInner)"/>
+                            <path d="M50 20 L74 32 V52 C74 68 50 80 50 80 C50 80 26 68 26 52 V32 L50 20 Z" 
+                                  fill="rgba(5, 8, 17, 0.85)" stroke="#00f3ff" stroke-width="1.8"/>
+                            <path d="M42 50 L48 56 L62 40" stroke="#00ff88" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                    </div>
+                    <div class="brand-text">
+                        <h2>Vigil<span>Sec</span></h2>
+                        <p>Web Vulnerability Scanner</p>
+                    </div>
+                </div>
+
+                <!-- Navigation Menu -->
+                <nav class="nav-menu" aria-label="Main Navigation">
+                    <a class="nav-item active" id="nav-scanner" href="#" role="button">
+                        <span class="nav-icon">🏠</span>
+                        <span>Scanner</span>
+                    </a>
+                    <a class="nav-item" id="nav-history" href="#" role="button">
+                        <span class="nav-icon">🕒</span>
+                        <span>Scan History</span>
+                        <span class="nav-badge" id="history-count-badge">0</span>
+                    </a>
+                    <a class="nav-item" id="nav-quick" href="#quick-targets-section" role="button">
+                        <span class="nav-icon">🎯</span>
+                        <span>Quick Targets</span>
+                    </a>
+                    <a class="nav-item" id="nav-settings" href="#" role="button">
+                        <span class="nav-icon">⚙️</span>
+                        <span>Settings</span>
+                    </a>
+                    <a class="nav-item" id="nav-about" href="#" role="button">
+                        <span class="nav-icon">ℹ️</span>
+                        <span>About</span>
+                    </a>
+                </nav>
+            </div>
+
+            <!-- Scanner Options Box -->
+            <div class="sidebar-panel">
+                <div class="section-title">
+                    <span class="icon-cyan">⚙️</span>
+                    <span>Scanner Options</span>
+                </div>
+                
+                <div class="slider-group">
+                    <div class="slider-label-row">
+                        <span>Request Timeout (seconds)</span>
+                        <span class="slider-val-tag" id="timeout-display-val">8s</span>
+                    </div>
+                    <input type="range" min="3" max="25" value="8" step="1" 
+                           class="cyber-slider" id="timeout-slider" aria-label="Request Timeout">
+                </div>
+            </div>
+
+            <!-- Quick Scan Targets Box -->
+            <div class="sidebar-panel" id="quick-targets-section">
+                <div class="section-title">
+                    <span class="icon-red">🎯</span>
+                    <span>Quick Scan Targets</span>
+                </div>
+
+                <div class="preset-list">
+                    <button type="button" class="preset-btn" id="preset-github" data-url="https://github.com">
+                        <span class="preset-left">
+                            <span>🐙</span>
+                            <span>GitHub (Secure A+)</span>
+                        </span>
+                        <span class="chevron">›</span>
+                    </button>
+
+                    <button type="button" class="preset-btn" id="preset-cloudflare" data-url="https://www.cloudflare.com">
+                        <span class="preset-left">
+                            <span>☁️</span>
+                            <span>Cloudflare (High Security)</span>
+                        </span>
+                        <span class="chevron">›</span>
+                    </button>
+
+                    <button type="button" class="preset-btn" id="preset-example" data-url="https://example.com">
+                        <span class="preset-left">
+                            <span>🌐</span>
+                            <span>Example.com (Missing Headers)</span>
+                        </span>
+                        <span class="chevron">›</span>
+                    </button>
+
+                    <button type="button" class="preset-btn" id="preset-insecure" data-url="http://neverssl.com">
+                        <span class="preset-left">
+                            <span>⚠️</span>
+                            <span>Insecure HTTP Demo</span>
+                        </span>
+                        <span class="chevron">›</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Subtle Brand Watermark -->
+            <div class="sidebar-watermark">
+                VIGILSEC // ACTIVE DEFENSE
+            </div>
+
+        </aside>
+
+        <!-- =========================================================
+             MAIN CONTENT / APPLICATION STAGE
+             ========================================================= -->
+        <main class="main-stage">
+
+            <!-- Top HUD Bar: ECG Heartbeat Monitor & Telemetry -->
+            <div class="top-hud-bar">
+                <div class="ecg-monitor-box">
+                    <div class="ecg-text-col">
+                        <span class="ecg-title">SECURE SCAN</span>
+                        <span class="ecg-sub">ANALYZE PROTECT</span>
+                    </div>
+                    <!-- Real-time Animated Heartbeat Canvas -->
+                    <canvas id="ecg-canvas" width="140" height="34"></canvas>
+                    <div class="status-dot-pulse"></div>
+                </div>
+            </div>
+
+            <!-- Hero Section: Hooded Cyber Operative Background & Title -->
+            <section class="hero-stage">
+                <div class="hero-hacker-bg"></div>
+                <div class="hero-content">
+                    <div class="hero-title-row">
+                        <div class="hero-shield-icon">
+                            <!-- Glowing Dual Tone Shield -->
+                            <svg width="46" height="46" viewBox="0 0 100 100" fill="none">
+                                <path d="M50 8 L85 24 V52 C85 75 50 92 50 92 C50 92 15 75 15 52 V24 L50 8 Z" 
+                                      stroke="#00f3ff" stroke-width="5" fill="rgba(0, 243, 255, 0.2)"/>
+                                <path d="M50 20 L74 32 V52 C74 68 50 80 50 80 C50 80 26 68 26 52 V32 L50 20 Z" 
+                                      fill="rgba(255, 0, 60, 0.4)" stroke="#ff003c" stroke-width="2"/>
+                            </svg>
+                        </div>
+                        <h1 class="hero-title">
+                            <span class="brand-accent">VigilSec</span> Application Scanner
+                        </h1>
+                    </div>
+                    <p class="hero-subtitle">
+                        Automated baseline security configuration, TLS inspection, and security header auditing
+                    </p>
+                </div>
+            </section>
+
+            <!-- Target Input Capsule Bar -->
+            <section class="input-bar-container">
+                <div class="input-capsule">
+                    <span class="link-icon">🔗</span>
+                    <input type="text" id="target-url-input" 
+                           placeholder="https://example.com or domain.com" 
+                           value="https://example.com" 
+                           autocomplete="off" 
+                           spellcheck="false"
+                           aria-label="Target Website URL">
+                    <button type="button" class="clear-btn" id="clear-input-btn" title="Clear URL">×</button>
+                </div>
+                <button type="button" class="btn-start-scan" id="btn-start-scan">
+                    <span>▶ Start Scan →</span>
+                </button>
+            </section>
+
+            <!-- Advanced Network Socket & Audit Controls (Collapsible Cyber Panel) -->
+            <section class="controls-hud-card" id="advanced-controls-panel">
+                <div class="controls-header" id="controls-toggle-btn" role="button" tabindex="0">
+                    <div class="controls-header-left">
+                        <span class="gear-icon">⚙️</span>
+                        <span>Advanced Network Socket & Audit Controls</span>
+                    </div>
+                    <button type="button" class="collapse-toggle" id="collapse-chevron" aria-label="Toggle Controls">
+                        ▲
+                    </button>
+                </div>
+
+                <div class="controls-grid" id="controls-collapsible-body">
+                    <!-- Column 1: Audit & Display Controls -->
+                    <div class="controls-col">
+                        <div class="col-heading">
+                            <span class="icon">💻</span>
+                            <span>Audit & Display Controls</span>
+                        </div>
+
+                        <div class="checkbox-list">
+                            <label class="cyber-checkbox-item">
+                                <input type="checkbox" id="cb-reverse-dns" checked>
+                                <span class="cyber-box">
+                                    <svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                                </span>
+                                <div class="checkbox-text-group">
+                                    <span class="checkbox-title">Enable Automatic Reverse DNS Lookup</span>
+                                    <span class="checkbox-desc">Resolve IP addresses to domain names automatically</span>
+                                </div>
+                            </label>
+
+                            <label class="cyber-checkbox-item">
+                                <input type="checkbox" id="cb-highlight-high" checked>
+                                <span class="cyber-box">
+                                    <svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                                </span>
+                                <div class="checkbox-text-group">
+                                    <span class="checkbox-title">Highlight High-Risk & Critical Findings</span>
+                                    <span class="checkbox-desc">Mark critical vulnerabilities with special indicators</span>
+                                </div>
+                            </label>
+
+                            <label class="cyber-checkbox-item">
+                                <input type="checkbox" id="cb-show-logs" checked>
+                                <span class="cyber-box">
+                                    <svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                                </span>
+                                <div class="checkbox-text-group">
+                                    <span class="checkbox-title">Show Monospace Live Terminal Logs</span>
+                                    <span class="checkbox-desc">Display real-time scan logs in terminal style</span>
+                                </div>
+                            </label>
+                        </div>
+                    </div>
+
+                    <!-- Column 2: Network Socket Limits -->
+                    <div class="controls-col">
+                        <div class="col-heading">
+                            <span class="icon">🌐</span>
+                            <span>Network Socket Limits</span>
+                        </div>
+
+                        <div class="stepper-list">
+                            <!-- Thread Pool Workers -->
+                            <div class="stepper-group">
+                                <label class="stepper-label" for="input-threads">Maximum Thread Pool Workers</label>
+                                <div class="stepper-control">
+                                    <button type="button" class="stepper-btn" id="threads-dec" aria-label="Decrease Threads">−</button>
+                                    <input type="number" id="input-threads" class="stepper-input" value="10" min="1" max="64">
+                                    <button type="button" class="stepper-btn" id="threads-inc" aria-label="Increase Threads">+</button>
+                                </div>
+                                <span class="stepper-desc">Number of concurrent workers for faster scanning</span>
+                            </div>
+
+                            <!-- Socket Timeout -->
+                            <div class="stepper-group">
+                                <label class="stepper-label" for="input-socket-timeout">Default Socket Connection Timeout (s)</label>
+                                <div class="stepper-control">
+                                    <button type="button" class="stepper-btn" id="socket-dec" aria-label="Decrease Socket Timeout">−</button>
+                                    <input type="number" id="input-socket-timeout" class="stepper-input" value="8" min="1" max="60">
+                                    <button type="button" class="stepper-btn" id="socket-inc" aria-label="Increase Socket Timeout">+</button>
+                                </div>
+                                <span class="stepper-desc">Timeout for network socket connections in seconds</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Bottom Stat HUD Cards (4 Neon Cards) -->
+            <section class="stat-cards-row">
+                <!-- Card 1: Scans Performed (Red) -->
+                <div class="stat-card card-red">
+                    <span class="stat-icon">🎯</span>
+                    <div class="stat-info">
+                        <span class="stat-value" id="stat-scans-val">0</span>
+                        <span class="stat-label">Scans Performed</span>
+                    </div>
+                </div>
+
+                <!-- Card 2: Vulnerabilities Found (Red) -->
+                <div class="stat-card card-red">
+                    <span class="stat-icon">🛡️</span>
+                    <div class="stat-info">
+                        <span class="stat-value" id="stat-vulns-val">0</span>
+                        <span class="stat-label">Vulnerabilities Found</span>
+                    </div>
+                </div>
+
+                <!-- Card 3: Targets Scanned (Cyan) -->
+                <div class="stat-card card-cyan">
+                    <span class="stat-icon">🌐</span>
+                    <div class="stat-info">
+                        <span class="stat-value" id="stat-targets-val">0</span>
+                        <span class="stat-label">Targets Scanned</span>
+                    </div>
+                </div>
+
+                <!-- Card 4: Avg. Scan Time (Cyan) -->
+                <div class="stat-card card-cyan">
+                    <span class="stat-icon">⏱️</span>
+                    <div class="stat-info">
+                        <span class="stat-value" id="stat-time-val">0s</span>
+                        <span class="stat-label">Avg. Scan Time</span>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Bottom Tag watermark -->
+            <div class="bottom-tag-row">
+                <span class="cyber-tag-badge">[ HACK &bull; DETECT &bull; DEFEND ]</span>
+            </div>
+
+            <!-- =========================================================
+                 ACTIVE SCANNING OVERLAY & TERMINAL STREAM
+                 ========================================================= -->
+            <section class="scanning-hud-section" id="scanning-hud-section">
+                <div class="scanning-radar-header">
+                    <div class="radar-sweep-icon"></div>
+                    <div>
+                        <h3 style="color: #00f3ff; font-family: var(--font-cyber); font-size: 1.05rem;">
+                            ACTIVE AUDIT PROBE IN PROGRESS
+                        </h3>
+                        <p style="color: #94a3b8; font-size: 0.85rem;" id="scanning-target-subtext">
+                            Connecting socket to target...
+                        </p>
+                    </div>
+                </div>
+
+                <div class="scan-progress-bar-wrap">
+                    <div class="scan-progress-fill" id="scan-progress-fill"></div>
+                </div>
+
+                <div class="terminal-box" id="terminal-stream-box">
+                    <div class="log-dim">[0.00s] INITIALIZING VIGILSEC PASSIVE SECURITY RUNNER...</div>
+                </div>
+            </section>
+
+            <!-- =========================================================
+                 RESULTS DASHBOARD (RENDERED AFTER SCAN)
+                 ========================================================= -->
+            <section class="results-section" id="results-dashboard-section">
+
+                <!-- Overall Score & Posture Banner -->
+                <div class="score-banner-card">
+                    <div class="score-banner-left">
+                        <div class="score-badge-row">
+                            <span class="audit-tag">Security Posture</span>
+                            <span class="status-pill status-pass">PASSIVE AUDIT COMPLETE</span>
+                        </div>
+                        <div class="target-url-title">
+                            Target: <span id="res-target-url">https://example.com</span>
+                        </div>
+                        <div class="resolved-meta" id="res-resolved-meta">
+                            Resolved to: <strong id="res-final-url">N/A</strong> &bull; Status: <strong id="res-http-status">200 OK</strong> &bull; Latency: <strong id="res-latency">0.45s</strong>
+                        </div>
+                    </div>
+
+                    <div class="score-banner-right">
+                        <div class="grade-badge-huge" id="res-grade-badge" style="background: #10b981;">
+                            A+
+                        </div>
+                        <div class="score-num-text" id="res-score-text">
+                            Score: 95/100
+                        </div>
+                    </div>
+                </div>
+
+                <!-- DNS Intelligence & Network Socket Info Strip -->
+                <div class="dns-intel-strip" id="dns-intel-strip">
+                    <div>
+                        <div class="dns-item-label">Target Host IP</div>
+                        <div class="dns-item-val" id="dns-ip-val">93.184.216.34</div>
+                    </div>
+                    <div>
+                        <div class="dns-item-label">Reverse DNS (PTR Record)</div>
+                        <div class="dns-item-val" id="dns-ptr-val">No PTR record</div>
+                    </div>
+                    <div>
+                        <div class="dns-item-label">Thread Pool Limit</div>
+                        <div class="dns-item-val" id="dns-workers-val" style="color: #34d399;">10 Workers</div>
+                    </div>
+                    <div>
+                        <div class="dns-item-label">Socket Timeout</div>
+                        <div class="dns-item-val" id="dns-timeout-val" style="color: #fbbf24;">8s</div>
+                    </div>
+                </div>
+
+                <!-- High Risk & Critical Callout Banner (shown if high risk issues exist) -->
+                <div class="critical-callout-banner" id="critical-alert-box" style="display: none;">
+                    <span class="alert-icon">🚨</span>
+                    <div>
+                        <strong style="color: #f87171; font-size: 1.05rem;" id="critical-alert-title">
+                            PRIORITY ATTENTION: Critical Security Findings Flagged
+                        </strong>
+                        <div style="color: #fca5a5; font-size: 0.88rem; margin-top: 2px;">
+                            Immediate defensive configuration required. Review the highlighted items below to remediate transport or header gaps.
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Monospace Live Socket Logs Stream (if enabled in controls) -->
+                <div id="live-logs-container">
+                    <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 6px;">
+                        <span style="font-size: 0.85rem; font-weight: 700; color: #38bdf8; font-family: var(--font-mono);">
+                            💻 Monospace Live Terminal Socket & Probe Feed
+                        </span>
+                        <button type="button" id="btn-toggle-terminal" style="background: transparent; border: 1px solid rgba(0, 243, 255, 0.3); color: #00f3ff; font-size: 0.75rem; padding: 2px 8px; border-radius: 4px; cursor: pointer;">
+                            Toggle Feed
+                        </button>
+                    </div>
+                    <div class="terminal-box" id="completed-terminal-box"></div>
+                </div>
+
+                <!-- Tabs Navigation -->
+                <div class="tabs-nav" role="tablist">
+                    <button type="button" class="tab-btn active" data-tab="tab-findings" id="tab-btn-findings">
+                        📋 Findings & Guidance (<span id="findings-count-tab">0</span>)
+                    </button>
+                    <button type="button" class="tab-btn" data-tab="tab-headers" id="tab-btn-headers">
+                        🛡️ Security Headers Matrix
+                    </button>
+                    <button type="button" class="tab-btn" data-tab="tab-cookies" id="tab-btn-cookies">
+                        🍪 Cookies Analysis (<span id="cookies-count-tab">0</span>)
+                    </button>
+                    <button type="button" class="tab-btn" data-tab="tab-raw" id="tab-btn-raw">
+                        🌐 Raw Network & Response Headers
+                    </button>
+                    <button type="button" class="tab-btn" data-tab="tab-export" id="tab-btn-export">
+                        📥 Export Report
+                    </button>
+                </div>
+
+                <!-- TAB 1: Findings & Guidance -->
+                <div class="tab-content-panel active" id="tab-findings">
+                    <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 8px;">
+                        <span style="font-size: 0.85rem; color: #94a3b8;">Filter by Severity:</span>
+                        <select id="severity-filter" style="background: #0b1220; border: 1px solid rgba(0, 243, 255, 0.3); color: #fff; border-radius: 6px; padding: 4px 10px; font-size: 0.85rem; outline: none;">
+                            <option value="ALL">All Severities</option>
+                            <option value="HIGH">High Severity Only</option>
+                            <option value="MEDIUM">Medium Severity Only</option>
+                            <option value="LOW">Low Severity Only</option>
+                            <option value="INFO">Informational Only</option>
+                        </select>
+                    </div>
+                    <div id="findings-cards-container" class="findings-list">
+                        <!-- Dynamically populated finding cards -->
+                    </div>
+                </div>
+
+                <!-- TAB 2: Security Headers Matrix -->
+                <div class="tab-content-panel" id="tab-headers">
+                    <p style="color: #94a3b8; font-size: 0.9rem; margin-bottom: 12px;">
+                        Modern browsers evaluate these server headers to enforce strict application isolation and security boundaries.
+                    </p>
+                    <div class="cyber-table-wrap">
+                        <table class="cyber-table">
+                            <thead>
+                                <tr>
+                                    <th>Security Header</th>
+                                    <th>Status</th>
+                                    <th>Severity if Missing</th>
+                                    <th>Received Value</th>
+                                    <th>Recommended Baseline</th>
+                                </tr>
+                            </thead>
+                            <tbody id="headers-matrix-tbody">
+                                <!-- Populated dynamically -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- TAB 3: Cookies Analysis -->
+                <div class="tab-content-panel" id="tab-cookies">
+                    <p style="color: #94a3b8; font-size: 0.9rem; margin-bottom: 12px;">
+                        Inspection of <code>Set-Cookie</code> directives for transmission security and defense against session hijacking.
+                    </p>
+                    <div class="cyber-table-wrap">
+                        <table class="cyber-table">
+                            <thead>
+                                <tr>
+                                    <th>Cookie Name</th>
+                                    <th>Secure Flag</th>
+                                    <th>HttpOnly Flag</th>
+                                    <th>SameSite Policy</th>
+                                    <th>Domain</th>
+                                    <th>Path</th>
+                                </tr>
+                            </thead>
+                            <tbody id="cookies-table-tbody">
+                                <!-- Populated dynamically -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- TAB 4: Raw Network & Response Headers -->
+                <div class="tab-content-panel" id="tab-raw">
+                    <div class="cyber-table-wrap">
+                        <table class="cyber-table">
+                            <thead>
+                                <tr>
+                                    <th>Header Name</th>
+                                    <th>Header Value</th>
+                                </tr>
+                            </thead>
+                            <tbody id="raw-headers-tbody">
+                                <!-- Populated dynamically -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- TAB 5: Export Report -->
+                <div class="tab-content-panel" id="tab-export">
+                    <p style="color: #94a3b8; font-size: 0.9rem; margin-bottom: 14px;">
+                        Export an assessment summary in structured JSON, audit Markdown, or print format.
+                    </p>
+                    <div class="export-row">
+                        <button type="button" class="btn-export" id="btn-download-json">
+                            📄 Download JSON Report
+                        </button>
+                        <button type="button" class="btn-export" id="btn-download-md">
+                            📝 Download Markdown Report
+                        </button>
+                        <button type="button" class="btn-export" id="btn-print-report">
+                            🖨️ Print / Save PDF
+                        </button>
+                    </div>
+
+                    <div style="margin-top: 18px;">
+                        <span style="font-size: 0.85rem; color: #94a3b8; font-weight: 600;">Report JSON Preview:</span>
+                        <div class="terminal-box" id="json-preview-box" style="margin-top: 6px; max-height: 200px;"></div>
+                    </div>
+                </div>
+
+            </section>
+
+        </main>
+    </div>
+
+    <!-- =========================================================
+         MODALS (Scan History, Settings, About)
+         ========================================================= -->
+
+    <!-- Scan History Modal -->
+    <div class="modal-overlay" id="history-modal">
+        <div class="modal-card">
+            <div class="modal-header">
+                <h3 class="modal-title">🕒 Scan History</h3>
+                <button type="button" class="modal-close-btn" id="close-history-modal">×</button>
+            </div>
+            <div id="history-list-container" style="display: flex; flex-direction: column; gap: 10px;">
+                <p style="color: #94a3b8;">No previous scans recorded yet.</p>
+            </div>
+            <div style="margin-top: 20px; display: flex; justify-content: flex-end;">
+                <button type="button" id="btn-clear-history" style="background: rgba(255,0,60,0.15); border: 1px solid #ff003c; color: #ff4d6d; padding: 6px 14px; border-radius: 6px; cursor: pointer; font-size: 0.85rem;">
+                    Clear Scan History
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Settings Modal -->
+    <div class="modal-overlay" id="settings-modal">
+        <div class="modal-card">
+            <div class="modal-header">
+                <h3 class="modal-title">⚙️ Cyber HUD Settings</h3>
+                <button type="button" class="modal-close-btn" id="close-settings-modal">×</button>
+            </div>
+            <div style="display: flex; flex-direction: column; gap: 18px;">
+                <label class="cyber-checkbox-item">
+                    <input type="checkbox" id="setting-matrix" checked>
+                    <span class="cyber-box"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"></polyline></svg></span>
+                    <div class="checkbox-text-group">
+                        <span class="checkbox-title">Matrix Digital Rain</span>
+                        <span class="checkbox-desc">Animated dual-color code falling streams</span>
+                    </div>
+                </label>
+
+                <label class="cyber-checkbox-item">
+                    <input type="checkbox" id="setting-globe" checked>
+                    <span class="cyber-box"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"></polyline></svg></span>
+                    <div class="checkbox-text-group">
+                        <span class="checkbox-title">3D Wireframe Cyber Globe</span>
+                        <span class="checkbox-desc">Rotating 3D telemetry sphere with coordinates</span>
+                    </div>
+                </label>
+
+                <label class="cyber-checkbox-item">
+                    <input type="checkbox" id="setting-grid" checked>
+                    <span class="cyber-box"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"></polyline></svg></span>
+                    <div class="checkbox-text-group">
+                        <span class="checkbox-title">Perspective Cyber Grid</span>
+                        <span class="checkbox-desc">Rolling neon horizon wireframe floor</span>
+                    </div>
+                </label>
+
+                <label class="cyber-checkbox-item">
+                    <input type="checkbox" id="setting-audio" checked>
+                    <span class="cyber-box"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"></polyline></svg></span>
+                    <div class="checkbox-text-group">
+                        <span class="checkbox-title">Synthesized Cyber Audio FX</span>
+                        <span class="checkbox-desc">Web Audio API sci-fi radar sweeps and clicks</span>
+                    </div>
+                </label>
+            </div>
+        </div>
+    </div>
+
+    <!-- About Modal -->
+    <div class="modal-overlay" id="about-modal">
+        <div class="modal-card">
+            <div class="modal-header">
+                <h3 class="modal-title">🛡️ About VigilSec Web Scanner</h3>
+                <button type="button" class="modal-close-btn" id="close-about-modal">×</button>
+            </div>
+            <div style="color: #cbd5e1; font-size: 0.92rem; line-height: 1.6; display: flex; flex-direction: column; gap: 12px;">
+                <p>
+                    <strong>VigilSec</strong> is an educational, non-intrusive security baseline auditor designed to analyze web infrastructure configurations, modern defensive HTTP response headers, cookie flags, and transport encryption.
+                </p>
+                <div style="background: rgba(15, 23, 42, 0.7); border-left: 3px solid #00f3ff; padding: 10px 14px; border-radius: 6px;">
+                    <strong>OWASP Defensive Header Guidelines:</strong>
+                    <ul style="margin-top: 6px; padding-left: 18px; font-size: 0.88rem; color: #94a3b8;">
+                        <li><strong>HSTS:</strong> Enforces HTTPS browser caching and defeats SSL stripping.</li>
+                        <li><strong>CSP:</strong> Defeats Cross-Site Scripting (XSS) and malicious data injections.</li>
+                        <li><strong>X-Content-Type-Options:</strong> Prevents MIME-type sniffing attacks.</li>
+                        <li><strong>X-Frame-Options:</strong> Mitigates Clickjacking by controlling framing.</li>
+                        <li><strong>Referrer-Policy:</strong> Protects user URL metadata in cross-site links.</li>
+                        <li><strong>Permissions-Policy:</strong> Disables sensitive hardware APIs.</li>
+                    </ul>
+                </div>
+                <p style="font-size: 0.82rem; color: #64748b;">
+                    * Passive scanner only. Always obtain authorized permission before auditing external domains.
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="background.js"></script>
+    <script src="app.js"></script>
+</body>
+</html>

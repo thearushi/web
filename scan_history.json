@@ -1,0 +1,19 @@
+[
+  {
+    "id": "scan_1792773152970",
+    "timestamp": 1792773152,
+    "url": "https://example.com",
+    "final_url": "https://example.com",
+    "status": 200,
+    "elapsed": 1.2190000000118744,
+    "score": {
+      "score": 44,
+      "grade": "D",
+      "color": "#EF4444"
+    },
+    "findings_count": 8,
+    "high_count": 1,
+    "header_checks_count": 6,
+    "cookie_checks_count": 0
+  }
+]
